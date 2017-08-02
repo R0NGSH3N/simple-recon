@@ -6,6 +6,10 @@ import org.springframework.context.ApplicationListener;
 
 public class ReconWorkersManager implements ApplicationListener<ReconWorkerStartEvent> {
 
+    public ReconWorker getReconWorkerByWorkerId(Long workerId){
+        return serviceLoader.getReconWorkerMap().get(workerId);
+    }
+
     @Autowired
     private ReconServiceLoader serviceLoader;
     /**

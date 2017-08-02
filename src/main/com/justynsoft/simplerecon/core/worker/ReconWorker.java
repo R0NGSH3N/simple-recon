@@ -1,15 +1,20 @@
 package com.justynsoft.simplerecon.core.worker;
 
+import com.justynsoft.simplerecon.core.dao.ReconWorkerLogDAO;
 import com.justynsoft.simplerecon.core.object.ReconObject;
 import com.justynsoft.simplerecon.core.service.ReconService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
+import java.util.Date;
 import java.util.List;
 
 public abstract class ReconWorker<T extends ReconObject> {
     private ReconWorkerEntity entity;
     private ReconService reconService;
     List<ReconObject> reconObjectList;
+    @Autowired
+    private ReconWorkerLogDAO workerLogDAO;
     private Class<T> clazz;
     private ReconService.STATE state = ReconService.STATE.PENDING;
 
@@ -31,6 +36,13 @@ public abstract class ReconWorker<T extends ReconObject> {
         List<T> result = load(event);
         reconService.addLoadedData(getId(), result);
         reconService.notifyWorkerReady(this.getId());
+
+        ReconWokerLog log = new ReconWokerLog(reconService.getId(), this.getId(), new Date(), result.size());
+        workerLogDAO.save(log);
+    }
+
+    public List<ReconWokerLog> getLoadHistory(){
+        return workerLogDAO.findByReconWorkerId(this.getId());
     }
 
     public ReconService getReconService() {
