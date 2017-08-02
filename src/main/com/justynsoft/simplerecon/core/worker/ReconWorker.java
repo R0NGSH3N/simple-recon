@@ -35,7 +35,6 @@ public abstract class ReconWorker<T extends ReconObject> {
         }
         List<T> result = load(event);
         reconService.addLoadedData(getId(), result);
-        reconService.notifyWorkerReady(this.getId());
 
         ReconWokerLog log = new ReconWokerLog(reconService.getId(), this.getId(), new Date(), result.size());
         workerLogDAO.save(log);
@@ -53,7 +52,7 @@ public abstract class ReconWorker<T extends ReconObject> {
         this.reconService = reconService;
     }
 
-    public abstract List load(ReconWorkerStartEvent event);
+    abstract List load(ReconWorkerStartEvent event);
 
     public ReconWorkerEntity getEntity() {
         return entity;

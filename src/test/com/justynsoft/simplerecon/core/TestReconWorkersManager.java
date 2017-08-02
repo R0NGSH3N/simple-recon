@@ -7,6 +7,8 @@ import com.justynsoft.simplerecon.core.dao.ReconWorkerPairDAO;
 import com.justynsoft.simplerecon.core.service.ReconService;
 import com.justynsoft.simplerecon.core.service.ReconServiceLoader;
 import com.justynsoft.simplerecon.core.worker.*;
+import com.justynsoft.simplerecon.traderecon.TradeAllocation;
+import com.justynsoft.simplerecon.traderecon.TradeAllocationDAO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +18,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +41,8 @@ public class TestReconWorkersManager implements ApplicationEventPublisherAware{
     ReconWorkerPairDAO reconWorkerPairDAO;
     @Autowired
     ReconServiceLoader serviceLoader;
-
+    @Autowired
+    TradeAllocationDAO tradeAllocationDAO;
 
 
     @Override
@@ -79,10 +83,30 @@ public class TestReconWorkersManager implements ApplicationEventPublisherAware{
         pair.setSecondaryReconWorkerId(fileWorker.getId());
         reconWorkerPairDAO.save(pair);
 
+        //setup test data for database recon worker
+        TradeAllocation allocation = new TradeAllocation();
+        allocation.setBlockId("1234");
+        allocation.setNetAmt(new BigDecimal(1.0));
+        allocation.setPortfolioId("10W");
+        allocation.setQuantity(new BigDecimal(1.0));
+        tradeAllocationDAO.save(allocation);
+
+        allocation = new TradeAllocation();
+        allocation.setBlockId("2345");
+        allocation.setNetAmt(new BigDecimal(2.0));
+        allocation.setQuantity(new BigDecimal(1.0));
+        tradeAllocationDAO.save(allocation);
+
+        allocation = new TradeAllocation();
+        allocation.setBlockId("1234");
+        allocation.setNetAmt(new BigDecimal(3.0));
+        allocation.setQuantity(new BigDecimal(1.0));
+        tradeAllocationDAO.save(allocation);
     }
 
     @Test
     public void test(){
+        serviceLoader.loadReconServices();
         ReconWorkerStartEvent startEvent = new ReconWorkerStartEvent(this);
         //database recon worker
         startEvent.setReconWorkerId(1L);
@@ -95,6 +119,7 @@ public class TestReconWorkersManager implements ApplicationEventPublisherAware{
         assertTrue(log.getId() == 1);
         assertTrue(log.getReconServiceId() == 1);
         assertTrue(log.getReconWorkerId() == 1);
-        assertTrue(log.getNumberOfRow())
+        assertTrue(log.getNumberOfRow() == 3);
+
     }
 }

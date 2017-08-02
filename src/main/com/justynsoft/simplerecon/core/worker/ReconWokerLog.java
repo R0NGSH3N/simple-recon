@@ -14,6 +14,8 @@ public class ReconWokerLog {
         this.numberOfRow = numberOfRow;
     }
 
+    public ReconWokerLog(){}
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

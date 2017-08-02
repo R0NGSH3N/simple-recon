@@ -149,6 +149,7 @@ public class ReconService<T extends ReconObject> {
 
     public void addLoadedData(Long reconWorkerId, List<T> result) {
         this.dataCache.put(reconWorkerId, result);
+        notifyWorkerReady(reconWorkerId);
     }
 
     public ReconReport primaryMatch(List<T> primary, List<T> secondary) {
@@ -272,11 +273,8 @@ public class ReconService<T extends ReconObject> {
         this.resultCache = new HashMap<>();
     }
 
-    public void notifyWorkerReady(Long reconWorkerId) {
+    private void notifyWorkerReady(Long reconWorkerId) {
 
-        if (dataCache.get(reconWorkerId) != null) {
-            throw new RuntimeException(" the Data for " + reconWorkerId + " has already been loaded, you need to reset the recon sevice to reload the data.");
-        }
         if (state != STATE.STARTED) {
             state = STATE.STARTED;
         }

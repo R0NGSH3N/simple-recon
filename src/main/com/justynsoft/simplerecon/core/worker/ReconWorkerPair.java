@@ -29,9 +29,9 @@ public class ReconWorkerPair {
     private PAIR_TYPE pairType;
 
     @Transient
-    private Boolean isPrimaryWorkerReady;
+    private Boolean isPrimaryWorkerReady = false;
     @Transient
-    private Boolean isSecondaryWorkerReady;
+    private Boolean isSecondaryWorkerReady = false;
 
     @Transient
     private ReconReport report;

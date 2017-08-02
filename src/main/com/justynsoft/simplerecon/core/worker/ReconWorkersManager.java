@@ -18,11 +18,11 @@ public class ReconWorkersManager implements ApplicationListener<ReconWorkerStart
     @Override
     public void onApplicationEvent(ReconWorkerStartEvent reconWorkerStartEvent) {
         Long reconWorkerId = reconWorkerStartEvent.getReconWorkerId();
-        if(reconWorkerId != null){
+        if(reconWorkerId == null){
             throw new RuntimeException(" We need Recon Worker Id to start the Recon worker");
         }else{
             ReconWorker reconWorker = serviceLoader.getReconWorkerMap().get(reconWorkerId);
-            reconWorker.load(reconWorkerStartEvent);
+            reconWorker.startLoad(reconWorkerStartEvent);
         }
 
     }
