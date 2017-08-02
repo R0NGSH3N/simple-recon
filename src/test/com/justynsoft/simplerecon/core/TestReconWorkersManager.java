@@ -84,6 +84,7 @@ public class TestReconWorkersManager implements ApplicationEventPublisherAware{
     @Test
     public void test(){
         ReconWorkerStartEvent startEvent = new ReconWorkerStartEvent(this);
+        //database recon worker
         startEvent.setReconWorkerId(1L);
         publisher.publishEvent(startEvent);
 
@@ -91,6 +92,9 @@ public class TestReconWorkersManager implements ApplicationEventPublisherAware{
         List<ReconWokerLog> history = reconWorker.getLoadHistory();
         assertTrue(history.size() == 1);
         ReconWokerLog log = history.get(0);
-        log.getId()
+        assertTrue(log.getId() == 1);
+        assertTrue(log.getReconServiceId() == 1);
+        assertTrue(log.getReconWorkerId() == 1);
+        assertTrue(log.getNumberOfRow())
     }
 }
