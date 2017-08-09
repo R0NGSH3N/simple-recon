@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVRecord;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -33,8 +34,8 @@ public class CSVFileReconWorker<T> extends ReconWorker{
             if(this.reader!= null){
                  records = CSVFormat.EXCEL.withHeader().parse(reader);
             }else{
-                Reader in = new FileReader(fileName);
-                records = CSVFormat.EXCEL.parse(in);
+                Reader in = new InputStreamReader(getClass().getResourceAsStream(fileName));
+                records = CSVFormat.EXCEL.withHeader().parse(in);
             }
             records.forEach( csvRecord ->{
                 try {

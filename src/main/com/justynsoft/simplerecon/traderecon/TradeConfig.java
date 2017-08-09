@@ -26,6 +26,7 @@ public class TradeConfig {
     public CSVFileReconWorker TradeAllocationCSVReconWorker(){
         CSVFileReconWorker csvFileReconWorker = new CSVFileReconWorker();
         csvFileReconWorker.setClazz(TradeAllocation.class);
+        csvFileReconWorker.setFileName("/com/justynsoft/simplerecon/traderecon/data.csv");
         return csvFileReconWorker;
     }
 }

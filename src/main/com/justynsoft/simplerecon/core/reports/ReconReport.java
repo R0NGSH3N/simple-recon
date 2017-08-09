@@ -10,6 +10,24 @@ public class ReconReport<T extends ReconObject>{
     private String errorMessage;
     private List<T> primaryList;
     private List<T> secondaryList;
+    private Long primaryReconWorkerId;
+    private Long secondaryReconWorkerId;
+
+    public Long getPrimaryReconWorkerId() {
+        return primaryReconWorkerId;
+    }
+
+    public void setPrimaryReconWorkerId(Long primaryReconWorkerId) {
+        this.primaryReconWorkerId = primaryReconWorkerId;
+    }
+
+    public Long getSecondaryReconWorkerId() {
+        return secondaryReconWorkerId;
+    }
+
+    public void setSecondaryReconWorkerId(Long secondaryReconWorkerId) {
+        this.secondaryReconWorkerId = secondaryReconWorkerId;
+    }
 
     public Boolean getMatch() {
         return isMatch;

@@ -58,7 +58,15 @@ public class ReconService<T extends ReconObject> {
     private ConcurrentHashMap<Long, List<T>> dataCache;
 
     @Transient
-    private Map<ReconWorkerPair, ReconReport> resultCache = new HashMap<>();
+    private List<ReconReport> resultCache = new ArrayList<>();
+
+    public List<ReconReport> getResults() {
+        return resultCache;
+    }
+
+    public void setResultCache(List<ReconReport> resultCache) {
+        this.resultCache = resultCache;
+    }
 
     public List<ReconWorkerPair> getReconWorkerPairs() {
         return reconWorkerPairs;
@@ -172,8 +180,6 @@ public class ReconService<T extends ReconObject> {
             return report;
         }
 
-        //to avoid messing the order of the lists we will use a copy
-        //as noted in comments by A. R. S.
         List primaryClone = new ArrayList<ReconObject>(primary);
         List secondaryClone = new ArrayList<ReconObject>(secondary);
         Collections.sort(primaryClone);
@@ -212,8 +218,6 @@ public class ReconService<T extends ReconObject> {
 
         }
 
-        //to avoid messing the order of the lists we will use a copy
-        //as noted in comments by A. R. S.
         List primaryClone = new ArrayList<ReconObject>(primary);
         List secondaryClone = new ArrayList<ReconObject>(secondary);
         Collections.sort(primaryClone);
@@ -252,14 +256,18 @@ public class ReconService<T extends ReconObject> {
         List<T> secondarySideData = this.dataCache.get(reconWorkerPair.getSecondaryReconWorkerId());
         if (reconWorkerPair.getPairType() == ReconWorkerPair.PAIR_TYPE.EXACT) {
             ReconReport result = exactMatch(primarySideData, secondarySideData);
-            this.resultCache.put(reconWorkerPair, result);
+            result.setPrimaryReconWorkerId(reconWorkerPair.getPrimaryReconWorkerId());
+            result.setSecondaryReconWorkerId(reconWorkerPair.getSecondaryReconWorkerId());
+            this.resultCache.add(result);
         } else {
             ReconReport result = primaryMatch(primarySideData, secondarySideData);
-            this.resultCache.put(reconWorkerPair, result);
+            result.setPrimaryReconWorkerId(reconWorkerPair.getPrimaryReconWorkerId());
+            result.setSecondaryReconWorkerId(reconWorkerPair.getSecondaryReconWorkerId());
+            this.resultCache.add(result);
         }
 
         //check if all the results done
-        if (resultCache.keySet().size() == resultCache.keySet().size()) {
+        if (resultCache.size() == reconWorkerPairs.size()) {
             this.state = STATE.COMPLETED;
             //TODO send result to email
         }
@@ -270,7 +278,7 @@ public class ReconService<T extends ReconObject> {
             state = STATE.PENDING;
         }
         this.dataCache = new ConcurrentHashMap<>();
-        this.resultCache = new HashMap<>();
+        this.resultCache = new ArrayList<>();
     }
 
     private void notifyWorkerReady(Long reconWorkerId) {

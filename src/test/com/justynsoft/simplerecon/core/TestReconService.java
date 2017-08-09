@@ -1,12 +1,14 @@
 package com.justynsoft.simplerecon.core;
 
-
 import com.justynsoft.simplerecon.core.dao.ReconServiceDAO;
 import com.justynsoft.simplerecon.core.dao.ReconWorkerEntityDAO;
 import com.justynsoft.simplerecon.core.dao.ReconWorkerPairDAO;
+import com.justynsoft.simplerecon.core.reports.ReconReport;
 import com.justynsoft.simplerecon.core.service.ReconService;
 import com.justynsoft.simplerecon.core.service.ReconServiceLoader;
-import com.justynsoft.simplerecon.core.worker.*;
+import com.justynsoft.simplerecon.core.worker.ReconWorkerEntity;
+import com.justynsoft.simplerecon.core.worker.ReconWorkerPair;
+import com.justynsoft.simplerecon.core.worker.ReconWorkerStartEvent;
 import com.justynsoft.simplerecon.traderecon.TradeAllocation;
 import com.justynsoft.simplerecon.traderecon.TradeAllocationDAO;
 import org.junit.Before;
@@ -18,21 +20,16 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static junit.framework.TestCase.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TestReconWorkersManager implements ApplicationEventPublisherAware{
-
-
-    @Autowired
-    private ReconWorkersManager workersManager;
-    private ApplicationEventPublisher publisher;
-
+public class TestReconService implements ApplicationEventPublisherAware{
     @Autowired
     ReconServiceDAO reconsServiceDAO;
     @Autowired
@@ -43,15 +40,15 @@ public class TestReconWorkersManager implements ApplicationEventPublisherAware{
     ReconServiceLoader serviceLoader;
     @Autowired
     TradeAllocationDAO tradeAllocationDAO;
-
+    private ApplicationEventPublisher publisher;
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-            this.publisher = applicationEventPublisher;
+        this.publisher = applicationEventPublisher;
     }
 
     @Before
-    public void setUp() {
+    public void setup(){
         //prepare recon service
         ReconService testService = new ReconService();
         testService.setName("TestService");
@@ -107,18 +104,20 @@ public class TestReconWorkersManager implements ApplicationEventPublisherAware{
     @Test
     public void test(){
         serviceLoader.loadReconServices();
+        ReconService testService = serviceLoader.getServiceMap().get(1L);
+
         ReconWorkerStartEvent startEvent = new ReconWorkerStartEvent(this);
         //database recon worker
         startEvent.setReconWorkerId(1L);
         publisher.publishEvent(startEvent);
 
-        ReconWorker reconWorker = workersManager.getReconWorkerByWorkerId(1L);
-        List<ReconWokerLog> history = reconWorker.getLoadHistory();
-        assertTrue(history.size() == 1);
-        ReconWokerLog log = history.get(0);
-        assertTrue(log.getId() == 1);
-        assertTrue(log.getReconServiceId() == 1);
-        assertTrue(log.getReconWorkerId() == 1);
-        assertTrue(log.getNumberOfRow() == 3);
+        startEvent = new ReconWorkerStartEvent(this);
+        //csvrecon worker
+        startEvent.setReconWorkerId(2L);
+        publisher.publishEvent(startEvent);
+
+        List<ReconReport> results = testService.getResults();
+        assertTrue(results.size() == 1);
+
     }
 }
